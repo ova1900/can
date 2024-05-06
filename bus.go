@@ -115,3 +115,18 @@ func (b *Bus) publish(frame Frame) {
 		h.Handle(frame)
 	}
 }
+func (b *Bus) Recv() (Frame, error) {
+	frame := Frame{}
+	err := b.rwc.ReadFrame(&frame)
+	if err != nil {
+		b.rwc.Close()
+
+		if err != io.EOF { // EOF is not an error, it happens when calling rwc.Close()
+			return frame, err
+		}
+
+		return frame, nil
+	}
+
+	return frame, nil
+}
